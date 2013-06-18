@@ -4,13 +4,21 @@
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
 Version: 2.5.0
-Release: 0.9.beta1%{?dist}
+Release: 0.10.beta1%{?dist}
 License: GPLv2+ and GPLv3+
 URL:     http://www.moc.daper.net
 Source0: http://ftp.daper.net/pub/soft/moc/unstable/%{name}-%{version}-beta1.tar.bz2
 
 ## This patch corrects all outdated FSF address
 Patch0: %{name}-r2506+fsf_addr.patch
+
+## This patchset corrects "Unsupported sample size!" error
+## See http://moc.daper.net/node/862
+Patch1: %{name}-r2506:2526-samplesize.patch
+
+## This patch corrects 'sizeof' argument bug; 
+## directly provided from upstream 
+Patch2: %{name}+warnings.patch
 
 BuildRequires: pkgconfig(ncurses) 
 BuildRequires: pkgconfig(alsa) 
@@ -36,6 +44,9 @@ BuildRequires: pkgconfig(opus)
 BuildRequires: libtool
 BuildRequires: librcc-devel
 
+## Source code configuring tools
+BuildRequires: autoconf, automake >= 1.13
+
 Requires: ffmpeg  
 Requires: opus
 
@@ -47,9 +58,19 @@ files in this directory beginning from the chosen file.
 
 %prep
 %setup -q -n %{name}-%{version}-beta1
-%patch0 -p1 -b %{name}-r2506+fsf_addr.patch
+%patch0 -p1
+%patch1 -p1
+%patch2 -p1
+
+## This renaming is requested by Automake-1.13
+mv configure.in configure.ac
 
 %build
+
+## Latest patchset changes ffmpeg.m4 file
+## Autoreconf is temporarily necessary
+autoreconf -i --force
+
 %configure --disable-static --with-rcc \
            --with-oss --with-alsa --with-jack --with-aac --with-mp3 \
            --with-musepack --with-vorbis --with-flac --with-wavpack  \
@@ -76,6 +97,13 @@ rm -f $RPM_BUILD_ROOT%_libdir/moc/decoder_plugins/*.la
 %{_libdir}/%{name}/decoder_plugins
 
 %changelog
+* Tue Jun 18 2013 Antonio Trande <sagitter@fedoraproject.org> 2.5.0-0.10.beta1
+- Added patchset to fix "Unsupported sample size!" error
+  See http://moc.daper.net/node/862 for more details
+- Added patch for 'sizeof' argument bug
+- Added BR: Autoconf and Automake-1.13 (temporarily)
+- 'configure.in' renaming
+
 * Sat Jun 08 2013 Antonio Trande <sagitter@fedoraproject.org> 2.5.0-0.9.beta1
 - Removed some explicit Requires (curl, jack-audio-connection-kit, ncurses, speex)
 
