@@ -4,21 +4,10 @@
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
 Version: 2.5.0
-Release: 0.10.beta1%{?dist}
+Release: 0.1.beta2%{?dist}
 License: GPLv2+ and GPLv3+
 URL:     http://www.moc.daper.net
-Source0: http://ftp.daper.net/pub/soft/moc/unstable/%{name}-%{version}-beta1.tar.bz2
-
-## This patch corrects all outdated FSF address
-Patch0: %{name}-r2506+fsf_addr.patch
-
-## This patchset corrects "Unsupported sample size!" error
-## See http://moc.daper.net/node/862
-Patch1: %{name}-r2506:2526-samplesize.patch
-
-## This patch corrects 'sizeof' argument bug; 
-## directly provided from upstream 
-Patch2: %{name}+warnings.patch
+Source0: http://ftp.daper.net/pub/soft/moc/unstable/%{name}-%{version}-beta2.tar.bz2
 
 BuildRequires: pkgconfig(ncurses) 
 BuildRequires: pkgconfig(alsa) 
@@ -43,12 +32,11 @@ BuildRequires: gettext-devel
 BuildRequires: pkgconfig(opus)
 BuildRequires: libtool
 BuildRequires: librcc-devel
-
-## Source code configuring tools
-BuildRequires: autoconf, automake >= 1.13
+BuildRequires: libquvi-devel, popt-devel
 
 Requires: ffmpeg  
 Requires: opus
+Requires: libquvi, libquvi-scripts, popt
 
 %description
 MOC (music on console) is a console audio player for LINUX/UNIX designed to be
@@ -57,25 +45,15 @@ using the menu similar to Midnight Commander, and MOC will start playing all
 files in this directory beginning from the chosen file.
 
 %prep
-%setup -q -n %{name}-%{version}-beta1
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-
-## This renaming is requested by Automake-1.13
-mv configure.in configure.ac
+%setup -q -n %{name}-%{version}-beta2
 
 %build
-
-## Latest patchset changes ffmpeg.m4 file
-## Autoreconf is temporarily necessary
-autoreconf -i --force
-
-%configure --disable-static --with-rcc \
+%configure --disable-static --disable-silent-rules \
+           --disable-rpath --with-rcc \
            --with-oss --with-alsa --with-jack --with-aac --with-mp3 \
            --with-musepack --with-vorbis --with-flac --with-wavpack  \
            --with-sndfile --with-modplug --with-ffmpeg --with-speex  \
-           --with-samplerate --with-curl
+           --with-samplerate --with-curl --disable-debug --without-magic
 make %{?_smp_mflags}
 
 %install
@@ -97,6 +75,10 @@ rm -f $RPM_BUILD_ROOT%_libdir/moc/decoder_plugins/*.la
 %{_libdir}/%{name}/decoder_plugins
 
 %changelog
+* Wed Feb 05 2014 Antonio Trande <sagitter@fedoraproject.org> 2.5.0-0.1.beta2
+- Update to 2.5.0-beta2
+- Removed previous patches
+
 * Tue Jun 18 2013 Antonio Trande <sagitter@fedoraproject.org> 2.5.0-0.10.beta1
 - Added patchset to fix "Unsupported sample size!" error
   See http://moc.daper.net/node/862 for more details
