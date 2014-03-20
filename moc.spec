@@ -1,13 +1,17 @@
 # Set up a new macro to define MOC's 'mocp' executable
-%global     exec   mocp
+%global   exec   mocp
 
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
 Version: 2.5.0
-Release: 0.1.beta2%{?dist}
+Release: 0.13.beta2%{?dist}
 License: GPLv2+ and GPLv3+
 URL:     http://www.moc.daper.net
-Source0: http://ftp.daper.net/pub/soft/moc/unstable/%{name}-%{version}-beta2.tar.bz2
+
+## Source archive from svn #2624; obtained by:
+## svn co svn://daper.net/moc/trunk
+## tar -czvf  moc-2.5.0-3.beta2.tar.gz trunk
+Source0: %{name}-%{version}-13.beta2.tar.gz
 
 BuildRequires: pkgconfig(ncurses) 
 BuildRequires: pkgconfig(alsa) 
@@ -34,6 +38,8 @@ BuildRequires: libtool
 BuildRequires: librcc-devel
 BuildRequires: libquvi-devel, popt-devel
 
+BuildRequires: autoconf, automake
+
 Requires: ffmpeg  
 Requires: opus
 Requires: libquvi, libquvi-scripts, popt
@@ -45,9 +51,14 @@ using the menu similar to Midnight Commander, and MOC will start playing all
 files in this directory beginning from the chosen file.
 
 %prep
-%setup -q -n %{name}-%{version}-beta2
+%setup -q -n trunk
 
 %build
+
+## Compilation files built temporary
+mv configure.in configure.ac
+autoreconf -i
+
 %configure --disable-static --disable-silent-rules \
            --disable-rpath --with-rcc \
            --with-oss --with-alsa --with-jack --with-aac --with-mp3 \
@@ -62,6 +73,14 @@ rm -rf $RPM_BUILD_ROOT%{_datadir}/doc
 rm -f $RPM_BUILD_ROOT%_libdir/*.la
 rm -f $RPM_BUILD_ROOT%_libdir/moc/decoder_plugins/*.la
 
+%ifarch armv6hl armv7hl
+pushd $RPM_BUILD_ROOT
+ for i in `find . -perm /644 -type f \( -name "*.so" -o -name "mocp" \)`; do
+ chmod a+x $i
+done
+popd
+%endif
+
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
@@ -75,7 +94,14 @@ rm -f $RPM_BUILD_ROOT%_libdir/moc/decoder_plugins/*.la
 %{_libdir}/%{name}/decoder_plugins
 
 %changelog
-* Wed Feb 05 2014 Antonio Trande <sagitter@fedoraproject.org> 2.5.0-0.1.beta2
+* Thu Mar 20 2014 Antonio Trande <sagitter@fedoraproject.org> 2.5.0-0.13.beta2
+- New svn commit of MOC-2.5.0 pre-release
+- Fixed release increment number for the pre-releases
+
+* Wed Feb 26 2014 Antonio Trande <sagitter@fedoraproject.org> 2.5.0-0.12.beta2
+- Fix unstripped-binary-or-object warnings for ARM builds
+
+* Wed Feb 05 2014 Antonio Trande <sagitter@fedoraproject.org> 2.5.0-0.11.beta2
 - Update to 2.5.0-beta2
 - Removed previous patches
 
