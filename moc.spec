@@ -8,10 +8,10 @@ Release: 0.14.beta2%{?dist}
 License: GPLv2+ and GPLv3+
 URL:     http://www.moc.daper.net
 
-## Source archive from svn #2624; obtained by:
+## Source archive from svn #2641; obtained by:
 ## svn co svn://daper.net/moc/trunk
-## tar -czvf  moc-2.5.0-3.beta2.tar.gz trunk
-Source0: %{name}-%{version}-13.beta2.tar.gz
+## tar -czvf  moc-2.5.0-14.beta2.tar.gz trunk
+Source0: %{name}-%{version}-14.beta2.tar.gz
 
 BuildRequires: pkgconfig(ncurses) 
 BuildRequires: pkgconfig(alsa) 
@@ -94,8 +94,8 @@ popd
 %{_libdir}/%{name}/decoder_plugins
 
 %changelog
-* Sat Mar 29 2014 Sérgio Basto <sergio@serjux.com> - 2.5.0-0.14.beta2
-- Rebuilt for ffmpeg-2.2
+* Tue May 13 2014 Antonio Trande <sagitter@fedoraproject.org> 2.5.0-0.14.beta2
+- New svn commit of MOC-2.5.0 pre-release (r2641)
 
 * Thu Mar 20 2014 Antonio Trande <sagitter@fedoraproject.org> 2.5.0-0.13.beta2
 - New svn commit of MOC-2.5.0 pre-release
