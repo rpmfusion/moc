@@ -4,7 +4,7 @@
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
 Version: 2.5.0
-Release: 0.15.beta2%{?dist}
+Release: 0.16.beta2%{?dist}
 License: GPLv2+ and GPLv3+
 URL:     http://www.moc.daper.net
 
@@ -94,6 +94,9 @@ popd
 %{_libdir}/%{name}/decoder_plugins
 
 %changelog
+* Thu Aug 07 2014 Sérgio Basto <sergio@serjux.com> - 2.5.0-0.16.beta2
+- Rebuilt for ffmpeg-2.3
+
 * Tue May 13 2014 Antonio Trande <sagitter@fedoraproject.org> 2.5.0-0.15.beta2
 - New svn commit of MOC-2.5.0 pre-release (r2641)
 
