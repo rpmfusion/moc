@@ -4,24 +4,24 @@
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
 Version: 2.5.0
-Release: 0.15.beta2%{?dist}
+Release: 1%{?dist}
 License: GPLv2+ and GPLv3+
 URL:     http://www.moc.daper.net
 
 ## Source archive from svn #2641; obtained by:
 ## svn co svn://daper.net/moc/trunk
-## tar -czvf  moc-2.5.0-14.beta2.tar.gz trunk
-Source0: %{name}-%{version}-14.beta2.tar.gz
+## tar -czvf  moc-2.5.0-17.beta2.tar.gz trunk
+## Source0: %%{name}-%%{version}-17.beta2.tar.gz
+
+Source0: http://ftp.daper.net/pub/soft/moc/stable/moc-2.5.0.tar.bz2
 
 BuildRequires: pkgconfig(ncurses) 
 BuildRequires: pkgconfig(alsa) 
 BuildRequires: pkgconfig(jack)
 BuildRequires: pkgconfig(libcurl) 
 BuildRequires: pkgconfig(samplerate) 
-BuildRequires: ffmpeg-devel
 BuildRequires: pkgconfig(taglib) 
 BuildRequires: pkgconfig(speex) 
-BuildRequires: libmad-devel 
 BuildRequires: pkgconfig(id3tag) 
 BuildRequires: pkgconfig(vorbis) 
 BuildRequires: pkgconfig(flac) 
@@ -38,9 +38,18 @@ BuildRequires: libtool
 BuildRequires: librcc-devel
 BuildRequires: libquvi-devel, popt-devel
 
+%ifnarch armv6hl armv7hl
+BuildRequires: ffmpeg-devel
+BuildRequires: libmad-devel
+%endif
+
+
 BuildRequires: autoconf, automake
 
-Requires: ffmpeg  
+%ifnarch armv6hl armv7hl
+Requires: ffmpeg 
+%endif
+ 
 Requires: opus
 Requires: libquvi, libquvi-scripts, popt
 
@@ -51,20 +60,28 @@ using the menu similar to Midnight Commander, and MOC will start playing all
 files in this directory beginning from the chosen file.
 
 %prep
-%setup -q -n trunk
+%setup -q -n %{name}-%{version}
 
 %build
 
 ## Compilation files built temporary
 mv configure.in configure.ac
-autoreconf -i
-
+autoreconf -ivf
+%ifarch armv6hl armv7hl
+%configure --disable-static --disable-silent-rules \
+           --disable-rpath --with-rcc \
+           --with-oss --with-alsa --with-jack --without-aac --with-mp3 \
+           --with-musepack --with-vorbis --with-flac --with-wavpack  \
+           --with-sndfile --with-modplug --without-ffmpeg --with-speex  \
+           --with-samplerate --with-curl --disable-debug --without-magic
+%else
 %configure --disable-static --disable-silent-rules \
            --disable-rpath --with-rcc \
            --with-oss --with-alsa --with-jack --with-aac --with-mp3 \
            --with-musepack --with-vorbis --with-flac --with-wavpack  \
            --with-sndfile --with-modplug --with-ffmpeg --with-speex  \
            --with-samplerate --with-curl --disable-debug --without-magic
+%endif
 make %{?_smp_mflags}
 
 %install
@@ -94,6 +111,13 @@ popd
 %{_libdir}/%{name}/decoder_plugins
 
 %changelog
+* Sat Aug 30 2014 Antonio Trande <sagitter@fedoraproject.org> 2.5.0-1
+- Update to release 2.5.0 (Consolidation)
+
+* Thu Aug 07 2014 Sérgio Basto <sergio@serjux.com> - 2.5.0-0.16.beta2
+- Rebuilt for ffmpeg-2.3
+- Conditional builds for ARM
+
 * Tue May 13 2014 Antonio Trande <sagitter@fedoraproject.org> 2.5.0-0.15.beta2
 - New svn commit of MOC-2.5.0 pre-release (r2641)
 
