@@ -4,7 +4,7 @@
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
 Version: 2.5.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2+ and GPLv3+
 URL:     http://www.moc.daper.net
 
@@ -37,19 +37,12 @@ BuildRequires: pkgconfig(opus)
 BuildRequires: libtool
 BuildRequires: librcc-devel
 BuildRequires: libquvi-devel, popt-devel
-
-%ifnarch armv6hl armv7hl
 BuildRequires: ffmpeg-devel
 BuildRequires: libmad-devel
-%endif
-
 
 BuildRequires: autoconf, automake
 
-%ifnarch armv6hl armv7hl
 Requires: ffmpeg 
-%endif
- 
 Requires: opus
 Requires: libquvi, libquvi-scripts, popt
 
@@ -67,21 +60,12 @@ files in this directory beginning from the chosen file.
 ## Compilation files built temporary
 mv configure.in configure.ac
 autoreconf -ivf
-%ifarch armv6hl armv7hl
-%configure --disable-static --disable-silent-rules \
-           --disable-rpath --with-rcc \
-           --with-oss --with-alsa --with-jack --without-aac --with-mp3 \
-           --with-musepack --with-vorbis --with-flac --with-wavpack  \
-           --with-sndfile --with-modplug --without-ffmpeg --with-speex  \
-           --with-samplerate --with-curl --disable-debug --without-magic
-%else
 %configure --disable-static --disable-silent-rules \
            --disable-rpath --with-rcc \
            --with-oss --with-alsa --with-jack --with-aac --with-mp3 \
            --with-musepack --with-vorbis --with-flac --with-wavpack  \
            --with-sndfile --with-modplug --with-ffmpeg --with-speex  \
            --with-samplerate --with-curl --disable-debug --without-magic
-%endif
 make %{?_smp_mflags}
 
 %install
@@ -89,14 +73,6 @@ make %{?_smp_mflags}
 rm -rf $RPM_BUILD_ROOT%{_datadir}/doc
 rm -f $RPM_BUILD_ROOT%_libdir/*.la
 rm -f $RPM_BUILD_ROOT%_libdir/moc/decoder_plugins/*.la
-
-%ifarch armv6hl armv7hl
-pushd $RPM_BUILD_ROOT
- for i in `find . -perm /644 -type f \( -name "*.so" -o -name "mocp" \)`; do
- chmod a+x $i
-done
-popd
-%endif
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -111,6 +87,9 @@ popd
 %{_libdir}/%{name}/decoder_plugins
 
 %changelog
+* Tue Sep 02 2014 Antonio Trande <sagitter@fedoraproject.org> 2.5.0-2
+- Spec cleanups
+
 * Sat Aug 30 2014 Antonio Trande <sagitter@fedoraproject.org> 2.5.0-1
 - Update to release 2.5.0 (Consolidation)
 
