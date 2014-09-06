@@ -3,17 +3,18 @@
 
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
-Version: 2.5.0
-Release: 2%{?dist}
+Version: 2.6
+Release: 0.1.alpha1%{?dist}
 License: GPLv2+ and GPLv3+
 URL:     http://www.moc.daper.net
 
-## Source archive from svn #2641; obtained by:
+## Source archive from svn #2670; obtained by:
 ## svn co svn://daper.net/moc/trunk
-## tar -czvf  moc-2.5.0-17.beta2.tar.gz trunk
-## Source0: %%{name}-%%{version}-17.beta2.tar.gz
+## tar -cJvf  moc-2.6-0.1.alpha1.tar.xz trunk
+## Source0: %{name}-%{version}-0.1.alpha1.tar.xz
+## Source0: moc-2.6-alpha1.tar.xz
 
-Source0: http://ftp.daper.net/pub/soft/moc/stable/moc-2.5.0.tar.bz2
+Source0: http://ftp.daper.net/pub/soft/moc/unstable/moc-2.6-alpha1.tar.xz
 
 BuildRequires: pkgconfig(ncurses) 
 BuildRequires: pkgconfig(alsa) 
@@ -53,13 +54,13 @@ using the menu similar to Midnight Commander, and MOC will start playing all
 files in this directory beginning from the chosen file.
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q -n moc-2.6-alpha1
 
 %build
 
 ## Compilation files built temporary
 mv configure.in configure.ac
-autoreconf -ivf
+autoreconf -ivf -Wobsolete
 %configure --disable-static --disable-silent-rules \
            --disable-rpath --with-rcc \
            --with-oss --with-alsa --with-jack --with-aac --with-mp3 \
@@ -87,6 +88,9 @@ rm -f $RPM_BUILD_ROOT%_libdir/moc/decoder_plugins/*.la
 %{_libdir}/%{name}/decoder_plugins
 
 %changelog
+* Tue Sep 02 2014 Antonio Trande <sagitter@fedoraproject.org> 2.6-0.1.alpha1
+- Leap to 2.6-alpha1 release
+
 * Tue Sep 02 2014 Antonio Trande <sagitter@fedoraproject.org> 2.5.0-2
 - Spec cleanups
 
