@@ -4,17 +4,14 @@
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
 Version: 2.6
-Release: 0.3.alpha1%{?dist}
+Release: 0.5.alpha1%{?dist}
 License: GPLv2+ and GPLv3+
 URL:     http://www.moc.daper.net
 
-## Source archive from svn #2670; obtained by:
+## Source archive from svn #2770; obtained by:
 ## svn co svn://daper.net/moc/trunk
-## tar -cJvf  moc-2.6-0.1.alpha1.tar.xz trunk
-## Source0: %{name}-%{version}-0.1.alpha1.tar.xz
-## Source0: moc-2.6-alpha1.tar.xz
-
-Source0: http://ftp.daper.net/pub/soft/moc/unstable/moc-2.6-alpha1.tar.xz
+## tar -cJvf  moc-2.6-0.4.alpha1.tar.xz trunk
+Source0: %{name}-%{version}-0.5.alpha1.tar.xz
 
 BuildRequires: pkgconfig(ncurses) 
 BuildRequires: pkgconfig(alsa) 
@@ -54,13 +51,14 @@ using the menu similar to Midnight Commander, and MOC will start playing all
 files in this directory beginning from the chosen file.
 
 %prep
-%setup -q -n moc-2.6-alpha1
+%setup -q -n trunk
 
 %build
 
 ## Compilation files built temporary
+autoupdate -v
 mv configure.in configure.ac
-autoreconf -ivf -Wobsolete
+autoreconf -ivf
 %configure --disable-static --disable-silent-rules \
            --disable-rpath --with-rcc \
            --with-oss --with-alsa --with-jack --with-aac --with-mp3 \
@@ -79,15 +77,21 @@ rm -f $RPM_BUILD_ROOT%_libdir/moc/decoder_plugins/*.la
 %postun -p /sbin/ldconfig
 
 %files
-%doc README README_equalizer AUTHORS ChangeLog COPYING config.example keymap.example NEWS
-%dir %{_datadir}/%{name}
+%doc README README_equalizer AUTHORS ChangeLog config.example keymap.example NEWS
+%license COPYING
 %{_bindir}/%{exec}
-%{_datadir}/%{name}/themes/*
+%{_datadir}/%{name}/
 %{_mandir}/man1/%{exec}.*
-%dir %{_libdir}/%{name}
-%{_libdir}/%{name}/decoder_plugins
+%{_libdir}/%{name}/
 
 %changelog
+* Tue Sep 29 2015 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.5.alpha1
+- Update to svn commit #2776
+- Used %%license macro
+
+* Tue Mar 24 2015 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.4.alpha1
+- Update to svn commit #2770
+
 * Mon Oct 20 2014 Sérgio Basto <sergio@serjux.com> - 2.6-0.3.alpha1
 - Rebuilt for FFmpeg 2.4.3
 
