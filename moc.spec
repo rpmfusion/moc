@@ -1,10 +1,14 @@
+%if 0%{?fedora} <= 22
+%global _hardened_build 1
+%endif
+
 # Set up a new macro to define MOC's 'mocp' executable
 %global   exec   mocp
 
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
 Version: 2.6
-Release: 0.5.alpha1%{?dist}
+Release: 0.6.alpha1%{?dist}
 License: GPLv2+ and GPLv3+
 URL:     http://www.moc.daper.net
 
@@ -59,12 +63,14 @@ files in this directory beginning from the chosen file.
 autoupdate -v
 mv configure.in configure.ac
 autoreconf -ivf
-%configure --disable-static --disable-silent-rules \
-           --disable-rpath --with-rcc \
-           --with-oss --with-alsa --with-jack --with-aac --with-mp3 \
-           --with-musepack --with-vorbis --with-flac --with-wavpack  \
-           --with-sndfile --with-modplug --with-ffmpeg --with-speex  \
-           --with-samplerate --with-curl --disable-debug --without-magic
+export CFLAGS="$RPM_OPT_FLAGS -Wl,-z,relro -Wl,-z,now"
+export CXXFLAGS="$RPM_OPT_FLAGS -Wl,-z,relro -Wl,-z,now"
+export LDFLAGS="$RPM_LD_FLAGS -Wl,-z,now"
+%configure --disable-static --disable-silent-rules --disable-rpath --with-rcc \
+ --with-oss --with-alsa --with-jack --with-aac --with-mp3 \
+ --with-musepack --with-vorbis --with-flac --with-wavpack  \
+ --with-sndfile --with-modplug --with-ffmpeg --with-speex  \
+ --with-samplerate --with-curl --disable-debug --without-magic
 make %{?_smp_mflags}
 
 %install
@@ -85,6 +91,9 @@ rm -f $RPM_BUILD_ROOT%_libdir/moc/decoder_plugins/*.la
 %{_libdir}/%{name}/
 
 %changelog
+* Sun Nov 01 2015 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.6.alpha1
+- Hardened builds on <F23
+
 * Tue Sep 29 2015 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.5.alpha1
 - Update to svn commit #2776
 - Used %%license macro
