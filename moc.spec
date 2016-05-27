@@ -1,52 +1,45 @@
-%if 0%{?fedora} <= 22
-%global _hardened_build 1
-%endif
+%undefine _hardened_build
 
-# Set up a new macro to define MOC's 'mocp' executable
-%global   exec   mocp
+Name:           moc
+Epoch:          1
+Version:        2.6
+Release:        0.1.alpha2%{?dist}
+Summary:        Music on Console - Console audio player for Linux/UNIX
+Group:          Applications/Multimedia
+License:        GPLv2+ and GPLv3+
+URL:            http://moc.daper.net/
+Source0:        http://ftp.daper.net/pub/soft/%{name}/unstable/%{name}-%{version}-alpha2.tar.xz
 
-Name:    moc
-Summary: Music on Console - Console audio player for Linux/UNIX
-Version: 2.6
-Release: 0.6.alpha1%{?dist}
-License: GPLv2+ and GPLv3+
-URL:     http://www.moc.daper.net
+# Fix rpmlint E: incorrect-fsf-address
+Patch0:         trivial-update-FSF-address.patch
 
-## Source archive from svn #2770; obtained by:
-## svn co svn://daper.net/moc/trunk
-## tar -cJvf  moc-2.6-0.4.alpha1.tar.xz trunk
-Source0: %{name}-%{version}-0.5.alpha1.tar.xz
-
-BuildRequires: pkgconfig(ncurses) 
-BuildRequires: pkgconfig(alsa) 
-BuildRequires: pkgconfig(jack)
-BuildRequires: pkgconfig(libcurl) 
-BuildRequires: pkgconfig(samplerate) 
-BuildRequires: pkgconfig(taglib) 
-BuildRequires: pkgconfig(speex) 
-BuildRequires: pkgconfig(id3tag) 
-BuildRequires: pkgconfig(vorbis) 
-BuildRequires: pkgconfig(flac) 
-BuildRequires: pkgconfig(zlib) 
-BuildRequires: pkgconfig(sndfile) 
-BuildRequires: pkgconfig(libmodplug) 
-BuildRequires: pkgconfig(libtimidity) 
-BuildRequires: pkgconfig(wavpack) 
-BuildRequires: libdb-devel 
-BuildRequires: libtool-ltdl-devel 
-BuildRequires: gettext-devel 
-BuildRequires: pkgconfig(opus)
-BuildRequires: libtool
-BuildRequires: librcc-devel
-BuildRequires: libquvi-devel, popt-devel
-BuildRequires: ffmpeg-devel
-BuildRequires: libmad-devel
-
-BuildRequires: autoconf, automake
-
-Requires: ffmpeg 
-Requires: opus
-Requires: libquvi, libquvi-scripts, popt
+BuildRequires:  alsa-lib-devel
+BuildRequires:  faad2-devel
+BuildRequires:  ffmpeg-devel
+BuildRequires:  file-devel
+BuildRequires:  flac-devel
+BuildRequires:  jack-audio-connection-kit-devel
+BuildRequires:  libao-devel
+BuildRequires:  libcurl-devel
+BuildRequires:  libdb-devel
+BuildRequires:  libid3tag-devel
+BuildRequires:  libmad-devel
+BuildRequires:  libmodplug-devel
+BuildRequires:  libmpcdec-devel
+BuildRequires:  libogg-devel
+BuildRequires:  librcc-devel
+BuildRequires:  libsamplerate-devel
+BuildRequires:  libsndfile-devel
+BuildRequires:  libtimidity-devel
+BuildRequires:  libtool
+BuildRequires:  libtool-ltdl-devel
+BuildRequires:  libvorbis-devel
+BuildRequires:  ncurses-devel
+BuildRequires:  popt-devel
+BuildRequires:  speex-devel
+BuildRequires:  taglib-devel
+BuildRequires:  wavpack-devel
+BuildRequires:  zlib-devel
 
 %description
 MOC (music on console) is a console audio player for LINUX/UNIX designed to be
@@ -55,42 +48,50 @@ using the menu similar to Midnight Commander, and MOC will start playing all
 files in this directory beginning from the chosen file.
 
 %prep
-%setup -q -n trunk
+%autosetup -n %{name}-%{version}-alpha2 -p1
 
 %build
+%configure \
+       --prefix=/usr \
+       --without-rcc \
+       --with-oss \
+       --with-alsa \
+       --with-jack \
+       --with-aac \
+       --with-mp3 \
+       --with-musepack \
+       --with-vorbis \
+       --with-flac \
+       --with-wavpack \
+       --with-sndfile \
+       --with-modplug \
+       --with-ffmpeg \
+       --with-speex \
+       --with-samplerate \
+       --with-curl  \
+       --disable-cache \
+       --disable-debug
 
-## Compilation files built temporary
-autoupdate -v
-mv configure.in configure.ac
-autoreconf -ivf
-export CFLAGS="$RPM_OPT_FLAGS -Wl,-z,relro -Wl,-z,now"
-export CXXFLAGS="$RPM_OPT_FLAGS -Wl,-z,relro -Wl,-z,now"
-export LDFLAGS="$RPM_LD_FLAGS -Wl,-z,now"
-%configure --disable-static --disable-silent-rules --disable-rpath --with-rcc \
- --with-oss --with-alsa --with-jack --with-aac --with-mp3 \
- --with-musepack --with-vorbis --with-flac --with-wavpack  \
- --with-sndfile --with-modplug --with-ffmpeg --with-speex  \
- --with-samplerate --with-curl --disable-debug --without-magic
-make %{?_smp_mflags}
+%make_build V=1
 
 %install
 %make_install
-rm -rf $RPM_BUILD_ROOT%{_datadir}/doc
-rm -f $RPM_BUILD_ROOT%_libdir/*.la
-rm -f $RPM_BUILD_ROOT%_libdir/moc/decoder_plugins/*.la
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%{__rm} -r %{buildroot}%{_docdir}/%{name}
+%{__rm} -r %{buildroot}%{_libdir}/%{name}/decoder_plugins/lib*.la
 
 %files
-%doc README README_equalizer AUTHORS ChangeLog config.example keymap.example NEWS
+%doc AUTHORS README* config.example.in keymap.example
 %license COPYING
-%{_bindir}/%{exec}
-%{_datadir}/%{name}/
-%{_mandir}/man1/%{exec}.*
-%{_libdir}/%{name}/
+%{_bindir}/%{name}p
+%{_datadir}/%{name}
+%{_libdir}/%{name}/decoder_plugins/lib*.so
+%{_mandir}/man1/%{name}p.1.*
 
 %changelog
+* Fri May 27 2016 nrechn <neil@gyz.io> - 2.6-0.1.alpha2
+- Update to 2.6-alpha2
+
 * Sun Nov 01 2015 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.6.alpha1
 - Hardened builds on <F23
 
