@@ -1,6 +1,4 @@
-%if 0%{?fedora} <= 22
-%global _hardened_build 1
-%endif
+%global checkout 2880
 
 # Set up a new macro to define MOC's 'mocp' executable
 %global   exec   mocp
@@ -8,16 +6,18 @@
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
 Version: 2.6
-Release: 0.6.alpha1%{?dist}
+Release: 0.10.alpha2%{?dist}
 License: GPLv2+ and GPLv3+
-URL:     http://www.moc.daper.net
+URL:     http://moc.daper.net
 
-## Source archive from svn #2770; obtained by:
-## svn co svn://daper.net/moc/trunk
-## tar -cJvf  moc-2.6-0.4.alpha1.tar.xz trunk
-Source0: %{name}-%{version}-0.5.alpha1.tar.xz
+## Source archive made by using following commands
+## svn co svn://svn.daper.net/moc/trunk
+## rm -rf trunk/.svn
+## tar -cvzf moc-git%%{checkout}.tar.gz trunk
+Source0: moc-git%{checkout}.tar.gz
+#Source0: http://ftp.daper.net/pub/soft/moc/unstable/moc-#%{version}-alpha2.tar.xz
 
-BuildRequires: pkgconfig(ncurses) 
+BuildRequires: pkgconfig(ncurses)
 BuildRequires: pkgconfig(alsa) 
 BuildRequires: pkgconfig(jack)
 BuildRequires: pkgconfig(libcurl) 
@@ -38,15 +38,12 @@ BuildRequires: gettext-devel
 BuildRequires: pkgconfig(opus)
 BuildRequires: libtool
 BuildRequires: librcc-devel
-BuildRequires: libquvi-devel, popt-devel
+BuildRequires: popt-devel
 BuildRequires: ffmpeg-devel
 BuildRequires: libmad-devel
+BuildRequires: faad2-devel
 
 BuildRequires: autoconf, automake
-
-Requires: ffmpeg 
-Requires: opus
-Requires: libquvi, libquvi-scripts, popt
 
 %description
 MOC (music on console) is a console audio player for LINUX/UNIX designed to be
@@ -58,29 +55,22 @@ files in this directory beginning from the chosen file.
 %setup -q -n trunk
 
 %build
-
-## Compilation files built temporary
-autoupdate -v
-mv configure.in configure.ac
 autoreconf -ivf
-export CFLAGS="$RPM_OPT_FLAGS -Wl,-z,relro -Wl,-z,now"
-export CXXFLAGS="$RPM_OPT_FLAGS -Wl,-z,relro -Wl,-z,now"
-export LDFLAGS="$RPM_LD_FLAGS -Wl,-z,now"
+
 %configure --disable-static --disable-silent-rules --disable-rpath --with-rcc \
  --with-oss --with-alsa --with-jack --with-aac --with-mp3 \
- --with-musepack --with-vorbis --with-flac --with-wavpack  \
- --with-sndfile --with-modplug --with-ffmpeg --with-speex  \
- --with-samplerate --with-curl --disable-debug --without-magic
-make %{?_smp_mflags}
+ --with-musepack --with-vorbis --with-flac --with-wavpack \
+ --with-sndfile --with-modplug --with-ffmpeg --with-speex \
+ --with-samplerate --with-curl --disable-debug --without-magic \
+ CPPFLAGS="-I%{_includedir}/libdb -fPIC"
+ 
+%make_build
 
 %install
 %make_install
 rm -rf $RPM_BUILD_ROOT%{_datadir}/doc
 rm -f $RPM_BUILD_ROOT%_libdir/*.la
 rm -f $RPM_BUILD_ROOT%_libdir/moc/decoder_plugins/*.la
-
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
 
 %files
 %doc README README_equalizer AUTHORS ChangeLog config.example keymap.example NEWS
@@ -91,6 +81,20 @@ rm -f $RPM_BUILD_ROOT%_libdir/moc/decoder_plugins/*.la
 %{_libdir}/%{name}/
 
 %changelog
+* Sun Jun 05 2016 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.10.alpha2
+- Update to commit 2880
+- Rebuild for ffmpeg 2.8.7
+
+* Mon May 16 2016 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.9.alpha2
+- Fix faad2 dependencies
+
+* Mon Apr 25 2016 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.8.alpha2
+- ldconfig commands removed
+
+* Thu Jan 28 2016 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.7.alpha2
+- Force -fstack-protector-all
+- Tries upstream patch
+
 * Sun Nov 01 2015 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.6.alpha1
 - Hardened builds on <F23
 
