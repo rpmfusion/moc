@@ -10,7 +10,7 @@
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
 Version: 2.6
-Release: 0.13.alpha2%{?dist}
+Release: 0.14.alpha2%{?dist}
 License: GPLv2+ and GPLv3+
 URL:     http://moc.daper.net
 
@@ -86,6 +86,9 @@ rm -f $RPM_BUILD_ROOT%_libdir/moc/decoder_plugins/*.la
 %{_libdir}/%{name}/
 
 %changelog
+* Sun Nov 06 2016 Leigh Scott <leigh123linux@googlemail.com> - 2.6-0.14.alpha2
+- rebuild for libtimidity .so bump
+
 * Fri Aug 12 2016 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.13.alpha2
 - Filtering of private libraries
 
