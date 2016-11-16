@@ -2,7 +2,7 @@
 %global __provides_exclude_from ^%{_libdir}/%{name}/.*\\.so$
 #
 
-%global checkout 2880
+#%%global checkout 2880
 
 # Set up a new macro to define MOC's 'mocp' executable
 %global   exec   mocp
@@ -10,7 +10,7 @@
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
 Version: 2.6
-Release: 0.14.alpha2%{?dist}
+Release: 0.15.alpha3%{?dist}
 License: GPLv2+ and GPLv3+
 URL:     http://moc.daper.net
 
@@ -18,8 +18,8 @@ URL:     http://moc.daper.net
 ## svn co svn://svn.daper.net/moc/trunk
 ## rm -rf trunk/.svn
 ## tar -cvzf moc-git%%{checkout}.tar.gz trunk
-Source0: moc-git%{checkout}.tar.gz
-#Source0: http://ftp.daper.net/pub/soft/moc/unstable/moc-#%{version}-alpha2.tar.xz
+#Source0: moc-git%%{checkout}.tar.gz
+Source0: http://ftp.daper.net/pub/soft/moc/unstable/moc-%{version}-alpha3.tar.xz
 
 BuildRequires: pkgconfig(ncurses)
 BuildRequires: pkgconfig(alsa) 
@@ -57,7 +57,7 @@ using the menu similar to Midnight Commander, and MOC will start playing all
 files in this directory beginning from the chosen file.
 
 %prep
-%setup -q -n trunk
+%setup -q -n moc-%{version}-alpha3
 
 %build
 autoreconf -ivf
@@ -74,8 +74,8 @@ autoreconf -ivf
 %install
 %make_install
 rm -rf $RPM_BUILD_ROOT%{_datadir}/doc
-rm -f $RPM_BUILD_ROOT%_libdir/*.la
-rm -f $RPM_BUILD_ROOT%_libdir/moc/decoder_plugins/*.la
+rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
+rm -f $RPM_BUILD_ROOT%{_libdir}/moc/decoder_plugins/*.la
 
 %files
 %doc README README_equalizer AUTHORS ChangeLog config.example keymap.example NEWS
@@ -86,6 +86,9 @@ rm -f $RPM_BUILD_ROOT%_libdir/moc/decoder_plugins/*.la
 %{_libdir}/%{name}/
 
 %changelog
+* Wed Nov 16 2016 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.15.alpha3
+- Update to alpha3
+
 * Sun Nov 06 2016 Leigh Scott <leigh123linux@googlemail.com> - 2.6-0.14.alpha2
 - rebuild for libtimidity .so bump
 
