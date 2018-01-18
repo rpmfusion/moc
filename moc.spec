@@ -10,7 +10,7 @@
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
 Version: 2.6
-Release: 0.21.alpha3%{?dist}
+Release: 0.22.alpha3%{?dist}
 License: GPLv3+
 URL:     http://moc.daper.net
 
@@ -86,6 +86,9 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/moc/decoder_plugins/*.la
 %{_libdir}/%{name}/
 
 %changelog
+* Thu Jan 18 2018 Leigh Scott <leigh123linux@googlemail.com> - 2.6-0.22.alpha3
+- Rebuilt for ffmpeg-3.5 git
+
 * Thu Dec 07 2017 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.21.alpha3
 - Use GPLv3+ license only
 
