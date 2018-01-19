@@ -20,6 +20,7 @@ URL:     http://moc.daper.net
 ## tar -cvzf moc-git%%{checkout}.tar.gz trunk
 #Source0: moc-git%%{checkout}.tar.gz
 Source0: http://ftp.daper.net/pub/soft/moc/unstable/moc-%{version}-alpha3.tar.xz
+Patch0:  ffmpeg35_buildfix.patch
 
 BuildRequires: pkgconfig(ncurses)
 BuildRequires: pkgconfig(alsa) 
@@ -58,6 +59,7 @@ files in this directory beginning from the chosen file.
 
 %prep
 %setup -q -n moc-%{version}-alpha3
+%patch0 -p1
 
 %build
 autoreconf -ivf
