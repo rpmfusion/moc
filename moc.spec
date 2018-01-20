@@ -10,7 +10,7 @@
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
 Version: 2.6
-Release: 0.22.alpha3%{?dist}
+Release: 0.23.alpha3%{?dist}
 License: GPLv3+
 URL:     http://moc.daper.net
 
@@ -20,7 +20,8 @@ URL:     http://moc.daper.net
 ## tar -cvzf moc-git%%{checkout}.tar.gz trunk
 #Source0: moc-git%%{checkout}.tar.gz
 Source0: http://ftp.daper.net/pub/soft/moc/unstable/moc-%{version}-alpha3.tar.xz
-Patch0:  ffmpeg35_buildfix.patch
+Patch0:  %{name}-ffmpeg35_buildfix.patch
+Patch1:  %{name}-r2961+timidity_sint8-1.patch
 
 BuildRequires: pkgconfig(ncurses)
 BuildRequires: pkgconfig(alsa) 
@@ -59,7 +60,10 @@ files in this directory beginning from the chosen file.
 
 %prep
 %setup -q -n moc-%{version}-alpha3
+%if 0%{?fedora} > 27
 %patch0 -p1
+%endif
+%patch1 -p1
 
 %build
 autoreconf -ivf
@@ -88,6 +92,10 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/moc/decoder_plugins/*.la
 %{_libdir}/%{name}/
 
 %changelog
+* Fri Jan 19 2018 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.23.alpha3
+- Rename patch for ffmpeg-3.5 and applied on fedora 28+
+- Add patch for timidity from upstream
+
 * Thu Jan 18 2018 Leigh Scott <leigh123linux@googlemail.com> - 2.6-0.22.alpha3
 - Rebuilt for ffmpeg-3.5 git
 
