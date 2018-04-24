@@ -10,7 +10,7 @@
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
 Version: 2.6
-Release: 0.25.alpha3%{?dist}
+Release: 0.26.alpha3%{?dist}
 License: GPLv3+
 URL:     http://moc.daper.net
 
@@ -22,6 +22,7 @@ URL:     http://moc.daper.net
 Source0: http://ftp.daper.net/pub/soft/moc/unstable/moc-%{version}-alpha3.tar.xz
 Patch0:  %{name}-ffmpeg35_buildfix.patch
 Patch1:  %{name}-r2961+timidity_sint8-1.patch
+Patch2:  %{name}-r2961+lt_init-1.patch
 
 BuildRequires: pkgconfig(ncurses)
 BuildRequires: pkgconfig(alsa) 
@@ -50,7 +51,7 @@ BuildRequires: libmad-devel
 BuildRequires: faad2-devel
 
 BuildRequires: autoconf, automake
-Requires: ffmpeg
+Requires: ffmpeg%{?_isa}
 
 %description
 MOC (music on console) is a console audio player for LINUX/UNIX designed to be
@@ -64,8 +65,11 @@ files in this directory beginning from the chosen file.
 %patch0 -p1
 %endif
 %patch1 -p1
+%patch2 -p1
 
 %build
+mv configure.in configure.ac
+libtoolize -ivfc
 autoreconf -ivf
 
 %configure --disable-static --disable-silent-rules --disable-rpath --with-rcc \
@@ -92,6 +96,9 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/moc/decoder_plugins/*.la
 %{_libdir}/%{name}/
 
 %changelog
+* Sun Apr 22 2018 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.26.alpha3
+- Use %%{?_isa} on 'Requires' package
+
 * Thu Mar 08 2018 RPM Fusion Release Engineering <leigh123linux@googlemail.com> - 2.6-0.25.alpha3
 - Rebuilt for new ffmpeg snapshot
 
