@@ -10,7 +10,7 @@
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
 Version: 2.6
-Release: 0.26.alpha3%{?dist}
+Release: 0.27.alpha3%{?dist}
 License: GPLv3+
 URL:     http://moc.daper.net
 
@@ -51,7 +51,6 @@ BuildRequires: libmad-devel
 BuildRequires: faad2-devel
 
 BuildRequires: autoconf, automake
-Requires: ffmpeg%{?_isa}
 
 %description
 MOC (music on console) is a console audio player for LINUX/UNIX designed to be
@@ -96,6 +95,9 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/moc/decoder_plugins/*.la
 %{_libdir}/%{name}/
 
 %changelog
+* Tue Apr 24 2018 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.27.alpha3
+- Remove unused ffmpeg dependency
+
 * Sun Apr 22 2018 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.26.alpha3
 - Use %%{?_isa} on 'Requires' package
 
