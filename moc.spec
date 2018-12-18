@@ -1,21 +1,30 @@
+# Filtering of private libraries
+%global __provides_exclude_from ^%{_libdir}/%{name}/.*\\.so$
+#
+
+#%%global checkout 2880
+
 # Set up a new macro to define MOC's 'mocp' executable
 %global   exec   mocp
 
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
-Version: 2.5.0
-Release: 2%{?dist}
-License: GPLv2+ and GPLv3+
-URL:     http://www.moc.daper.net
+Version: 2.6
+Release: 0.28.alpha3%{?dist}
+License: GPLv3+
+URL:     http://moc.daper.net
 
-## Source archive from svn #2641; obtained by:
-## svn co svn://daper.net/moc/trunk
-## tar -czvf  moc-2.5.0-17.beta2.tar.gz trunk
-## Source0: %%{name}-%%{version}-17.beta2.tar.gz
+## Source archive made by using following commands
+## svn co svn://svn.daper.net/moc/trunk
+## rm -rf trunk/.svn
+## tar -cvzf moc-git%%{checkout}.tar.gz trunk
+#Source0: moc-git%%{checkout}.tar.gz
+Source0: http://ftp.daper.net/pub/soft/moc/unstable/moc-%{version}-alpha3.tar.xz
+Patch0:  %{name}-ffmpeg35_buildfix.patch
+Patch1:  %{name}-r2961+timidity_sint8-1.patch
+Patch2:  %{name}-r2961+lt_init-1.patch
 
-Source0: http://ftp.daper.net/pub/soft/moc/stable/moc-2.5.0.tar.bz2
-
-BuildRequires: pkgconfig(ncurses) 
+BuildRequires: pkgconfig(ncurses)
 BuildRequires: pkgconfig(alsa) 
 BuildRequires: pkgconfig(jack)
 BuildRequires: pkgconfig(libcurl) 
@@ -36,15 +45,12 @@ BuildRequires: gettext-devel
 BuildRequires: pkgconfig(opus)
 BuildRequires: libtool
 BuildRequires: librcc-devel
-BuildRequires: libquvi-devel, popt-devel
+BuildRequires: popt-devel
 BuildRequires: ffmpeg-devel
 BuildRequires: libmad-devel
+BuildRequires: faad2-devel
 
 BuildRequires: autoconf, automake
-
-Requires: ffmpeg 
-Requires: opus
-Requires: libquvi, libquvi-scripts, popt
 
 %description
 MOC (music on console) is a console audio player for LINUX/UNIX designed to be
@@ -53,40 +59,130 @@ using the menu similar to Midnight Commander, and MOC will start playing all
 files in this directory beginning from the chosen file.
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q -n moc-%{version}-alpha3
+%if 0%{?fedora} > 27
+%patch0 -p1
+%endif
+%patch1 -p1
+%patch2 -p1
 
 %build
-
-## Compilation files built temporary
 mv configure.in configure.ac
+libtoolize -ivfc
 autoreconf -ivf
-%configure --disable-static --disable-silent-rules \
-           --disable-rpath --with-rcc \
-           --with-oss --with-alsa --with-jack --with-aac --with-mp3 \
-           --with-musepack --with-vorbis --with-flac --with-wavpack  \
-           --with-sndfile --with-modplug --with-ffmpeg --with-speex  \
-           --with-samplerate --with-curl --disable-debug --without-magic
-make %{?_smp_mflags}
+
+%configure --disable-static --disable-silent-rules --disable-rpath --with-rcc \
+ --with-oss --with-alsa --with-jack --with-aac --with-mp3 \
+ --with-musepack --with-vorbis --with-flac --with-wavpack \
+ --with-sndfile --with-modplug --with-ffmpeg --with-speex \
+ --with-samplerate --with-curl --disable-debug --without-magic \
+ CPPFLAGS="-I%{_includedir}/libdb -fPIC"
+ 
+%make_build
 
 %install
 %make_install
 rm -rf $RPM_BUILD_ROOT%{_datadir}/doc
-rm -f $RPM_BUILD_ROOT%_libdir/*.la
-rm -f $RPM_BUILD_ROOT%_libdir/moc/decoder_plugins/*.la
-
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
+rm -f $RPM_BUILD_ROOT%{_libdir}/moc/decoder_plugins/*.la
 
 %files
-%doc README README_equalizer AUTHORS ChangeLog COPYING config.example keymap.example NEWS
-%dir %{_datadir}/%{name}
+%doc README README_equalizer AUTHORS ChangeLog config.example keymap.example NEWS
+%license COPYING
 %{_bindir}/%{exec}
-%{_datadir}/%{name}/themes/*
+%{_datadir}/%{name}/
 %{_mandir}/man1/%{exec}.*
-%dir %{_libdir}/%{name}
-%{_libdir}/%{name}/decoder_plugins
+%{_libdir}/%{name}/
 
 %changelog
+* Fri Jul 27 2018 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 2.6-0.28.alpha3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
+
+* Tue Apr 24 2018 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.27.alpha3
+- Remove unused ffmpeg dependency
+
+* Sun Apr 22 2018 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.26.alpha3
+- Use %%{?_isa} on 'Requires' package
+
+* Thu Mar 08 2018 RPM Fusion Release Engineering <leigh123linux@googlemail.com> - 2.6-0.25.alpha3
+- Rebuilt for new ffmpeg snapshot
+
+* Thu Mar 01 2018 RPM Fusion Release Engineering <leigh123linux@googlemail.com> - 2.6-0.24.alpha3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
+
+* Fri Jan 19 2018 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.23.alpha3
+- Rename patch for ffmpeg-3.5 and applied on fedora 28+
+- Add patch for timidity from upstream
+
+* Thu Jan 18 2018 Leigh Scott <leigh123linux@googlemail.com> - 2.6-0.22.alpha3
+- Rebuilt for ffmpeg-3.5 git
+
+* Thu Dec 07 2017 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.21.alpha3
+- Use GPLv3+ license only
+
+* Tue Oct 17 2017 Leigh Scott <leigh123linux@googlemail.com> - 2.6-0.20.alpha3
+- Rebuild for ffmpeg update
+
+* Thu Aug 31 2017 RPM Fusion Release Engineering <kwizart@rpmfusion.org> - 2.6-0.19.alpha3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
+
+* Sat Apr 29 2017 Leigh Scott <leigh123linux@googlemail.com> - 2.6-0.18.alpha3
+- Rebuild for ffmpeg update
+
+* Mon Mar 20 2017 RPM Fusion Release Engineering <kwizart@rpmfusion.org> - 2.6-0.17.alpha3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
+
+* Mon Feb 13 2017 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.16.alpha3
+- Rebuild for GCC 7
+
+* Wed Nov 16 2016 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.15.alpha3
+- Update to alpha3
+
+* Sun Nov 06 2016 Leigh Scott <leigh123linux@googlemail.com> - 2.6-0.14.alpha2
+- rebuild for libtimidity .so bump
+
+* Fri Aug 12 2016 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.13.alpha2
+- Filtering of private libraries
+
+* Sat Jul 30 2016 Julian Sikorski <belegdol@fedoraproject.org> - 2.6-0.12.alpha2
+- Rebuilt for ffmpeg-3.1.1
+
+* Thu Jul 07 2016 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.11.alpha2
+- Add ffmpeg as Requires package
+
+* Sun Jun 05 2016 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.10.alpha2
+- Update to commit 2880
+- Rebuild for ffmpeg 2.8.7
+
+* Mon May 16 2016 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.9.alpha2
+- Fix faad2 dependencies
+
+* Mon Apr 25 2016 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.8.alpha2
+- ldconfig commands removed
+
+* Thu Jan 28 2016 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.7.alpha2
+- Force -fstack-protector-all
+- Tries upstream patch
+
+* Sun Nov 01 2015 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.6.alpha1
+- Hardened builds on <F23
+
+* Tue Sep 29 2015 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.5.alpha1
+- Update to svn commit #2776
+- Used %%license macro
+
+* Tue Mar 24 2015 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.4.alpha1
+- Update to svn commit #2770
+
+* Mon Oct 20 2014 Sérgio Basto <sergio@serjux.com> - 2.6-0.3.alpha1
+- Rebuilt for FFmpeg 2.4.3
+
+* Fri Sep 26 2014 Nicolas Chauvet <kwizart@gmail.com> - 2.6-0.2.alpha1
+- Rebuilt for FFmpeg 2.4.x
+
+* Tue Sep 02 2014 Antonio Trande <sagitter@fedoraproject.org> 2.6-0.1.alpha1
+- Leap to 2.6-alpha1 release
+
 * Tue Sep 02 2014 Antonio Trande <sagitter@fedoraproject.org> 2.5.0-2
 - Spec cleanups
 

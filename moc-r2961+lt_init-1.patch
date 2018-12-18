@@ -1,0 +1,21 @@
+diff --git a/configure.in b/configure.in
+index 3e3b11d..b1c974b 100644
+--- a/configure.in
++++ b/configure.in
+@@ -3,6 +3,8 @@ AC_INIT([Music On Console],[2.6-alpha3],[mocmaint@daper.net],[moc],
+ AC_CONFIG_SRCDIR([main.c])
+ AC_CONFIG_HEADERS([config.h])
+ 
++LT_INIT
++
+ AM_INIT_AUTOMAKE([dist-xz no-dist-gzip])
+ 
+ AC_PREREQ([2.64])
+@@ -34,7 +36,6 @@ AC_PROG_AWK
+ AC_LIBTOOL_DLOPEN
+ AC_DISABLE_STATIC
+ AC_ENABLE_SHARED
+-AC_PROG_LIBTOOL
+ AC_LIB_LTDL
+ 
+ AC_SUBST([EXTRA_OBJS])
