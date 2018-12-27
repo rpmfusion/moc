@@ -1,8 +1,12 @@
+## Debug builds?
+%bcond_with debug
+#
+
 # Filtering of private libraries
 %global __provides_exclude_from ^%{_libdir}/%{name}/.*\\.so$
 #
 
-#%%global checkout 2880
+%global checkout 2992
 
 # Set up a new macro to define MOC's 'mocp' executable
 %global   exec   mocp
@@ -10,7 +14,7 @@
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
 Version: 2.6
-Release: 0.28.alpha3%{?dist}
+Release: 0.29.svn%{checkout}%{?dist}
 License: GPLv3+
 URL:     http://moc.daper.net
 
@@ -18,11 +22,8 @@ URL:     http://moc.daper.net
 ## svn co svn://svn.daper.net/moc/trunk
 ## rm -rf trunk/.svn
 ## tar -cvzf moc-git%%{checkout}.tar.gz trunk
-#Source0: moc-git%%{checkout}.tar.gz
-Source0: http://ftp.daper.net/pub/soft/moc/unstable/moc-%{version}-alpha3.tar.xz
-Patch0:  %{name}-ffmpeg35_buildfix.patch
-Patch1:  %{name}-r2961+timidity_sint8-1.patch
-Patch2:  %{name}-r2961+lt_init-1.patch
+Source0: moc-git%{checkout}.tar.gz
+Patch0:  %{name}-r2961+lt_init-1.patch
 
 BuildRequires: pkgconfig(ncurses)
 BuildRequires: pkgconfig(alsa) 
@@ -59,23 +60,26 @@ using the menu similar to Midnight Commander, and MOC will start playing all
 files in this directory beginning from the chosen file.
 
 %prep
-%setup -q -n moc-%{version}-alpha3
-%if 0%{?fedora} > 27
-%patch0 -p1
-%endif
-%patch1 -p1
-%patch2 -p1
+%autosetup -p 1 -n trunk
 
 %build
 mv configure.in configure.ac
 libtoolize -ivfc
 autoreconf -ivf
 
+%if %{with debug}
+export CFLAGS="-O0 -g"
+%endif
 %configure --disable-static --disable-silent-rules --disable-rpath --with-rcc \
  --with-oss --with-alsa --with-jack --with-aac --with-mp3 \
  --with-musepack --with-vorbis --with-flac --with-wavpack \
  --with-sndfile --with-modplug --with-ffmpeg --with-speex \
- --with-samplerate --with-curl --disable-debug --without-magic \
+ --with-samplerate --with-curl --without-magic \
+%if %{with debug}
+ --enable-debug \
+%else
+ --disable-debug \
+%endif
  CPPFLAGS="-I%{_includedir}/libdb -fPIC"
  
 %make_build
@@ -95,6 +99,9 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/moc/decoder_plugins/*.la
 %{_libdir}/%{name}/
 
 %changelog
+* Thu Dec 27 2018 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.29.svn2992
+- SVN checkout svn2992
+
 * Fri Jul 27 2018 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 2.6-0.28.alpha3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
 
