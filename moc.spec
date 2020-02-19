@@ -6,7 +6,7 @@
 %global __provides_exclude_from ^%{_libdir}/%{name}/.*\\.so$
 #
 
-%global checkout 2992
+%global checkout 3005
 
 # Set up a new macro to define MOC's 'mocp' executable
 %global   exec   mocp
@@ -14,15 +14,15 @@
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
 Version: 2.6
-Release: 0.32.svn%{checkout}%{?dist}
+Release: 0.33.svn%{checkout}%{?dist}
 License: GPLv3+
 URL:     http://moc.daper.net
 
 ## Source archive made by using following commands
 ## svn co svn://svn.daper.net/moc/trunk
 ## rm -rf trunk/.svn
-## tar -cvzf moc-git%%{checkout}.tar.gz trunk
-Source0: moc-git%{checkout}.tar.gz
+## tar -cvzf moc-svn%%{checkout}.tar.gz trunk
+Source0: moc-svn%{checkout}.tar.gz
 Patch0:  %{name}-r2961+lt_init-1.patch
 
 BuildRequires: pkgconfig(ncurses)
@@ -99,6 +99,9 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/moc/decoder_plugins/*.la
 %{_libdir}/%{name}/
 
 %changelog
+* Wed Feb 19 2020 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.33.svn3005
+- SVN checkout svn3005
+
 * Wed Feb 05 2020 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 2.6-0.32.svn2992
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
