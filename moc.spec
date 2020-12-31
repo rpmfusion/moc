@@ -14,7 +14,7 @@
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
 Version: 2.6
-Release: 0.35.svn%{checkout}%{?dist}
+Release: 0.36.svn%{checkout}%{?dist}
 License: GPLv3+
 URL:     http://moc.daper.net
 
@@ -52,6 +52,7 @@ BuildRequires: libmad-devel
 BuildRequires: faad2-devel
 
 BuildRequires: autoconf, automake
+BuildRequires: make
 
 %description
 MOC (music on console) is a console audio player for LINUX/UNIX designed to be
@@ -99,6 +100,9 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/moc/decoder_plugins/*.la
 %{_libdir}/%{name}/
 
 %changelog
+* Thu Dec 31 2020 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.36.svn3005
+- Add make BR
+
 * Tue Aug 18 2020 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 2.6-0.35.svn3005
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
