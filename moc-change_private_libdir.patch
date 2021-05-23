@@ -1,0 +1,11 @@
+--- a/configure.orig.in	2021-05-23 11:16:38.105939142 +0200
++++ b/configure.in	2021-05-23 11:18:14.786746862 +0200
+@@ -40,7 +40,7 @@
+ 
+ AC_SUBST([EXTRA_OBJS])
+ 
+-plugindir=$libdir/moc
++plugindir=$libdir/mocp
+ AC_SUBST([plugindir])
+ PLUGIN_LDFLAGS='-module -avoid-version'
+ AC_SUBST([PLUGIN_LDFLAGS])

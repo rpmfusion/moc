@@ -3,7 +3,7 @@
 #
 
 # Filtering of private libraries
-%global __provides_exclude_from ^%{_libdir}/%{name}/.*\\.so$
+%global __provides_exclude_from ^%{_libdir}/mocp/.*\\.so$
 #
 
 %global checkout 3005
@@ -14,7 +14,7 @@
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
 Version: 2.6
-Release: 0.37.svn%{checkout}%{?dist}
+Release: 0.38.svn%{checkout}%{?dist}
 License: GPLv3+
 URL:     http://moc.daper.net
 
@@ -24,6 +24,9 @@ URL:     http://moc.daper.net
 ## tar -cvzf moc-svn%%{checkout}.tar.gz trunk
 Source0: moc-svn%{checkout}.tar.gz
 Patch0:  %{name}-r2961+lt_init-1.patch
+
+# RHBZ #1963427
+Patch1:  %{name}-change_private_libdir.patch
 
 BuildRequires: pkgconfig(ncurses)
 BuildRequires: pkgconfig(alsa) 
@@ -45,13 +48,14 @@ BuildRequires: libtool-ltdl-devel
 BuildRequires: gettext-devel 
 BuildRequires: pkgconfig(opus)
 BuildRequires: libtool
-BuildRequires: librcc-devel
+#BuildRequires: librcc-devel
 BuildRequires: popt-devel
 BuildRequires: ffmpeg-devel
 BuildRequires: libmad-devel
 BuildRequires: faad2-devel
 
 BuildRequires: autoconf, automake
+BuildRequires: gcc
 BuildRequires: make
 
 %description
@@ -71,7 +75,9 @@ autoreconf -ivf
 %if %{with debug}
 export CFLAGS="-O0 -g"
 %endif
-%configure --disable-static --disable-silent-rules --disable-rpath --with-rcc \
+export LT_SYS_LIBRARY_PATH=%{_libdir}/mocp
+%configure LT_SYS_LIBRARY_PATH=%{_libdir}/mocp \
+ --disable-static --disable-silent-rules --disable-rpath --without-rcc \
  --with-oss --with-alsa --with-jack --with-aac --with-mp3 \
  --with-musepack --with-vorbis --with-flac --with-wavpack \
  --with-sndfile --with-modplug --with-ffmpeg --with-speex \
@@ -89,7 +95,7 @@ export CFLAGS="-O0 -g"
 %make_install
 rm -rf $RPM_BUILD_ROOT%{_datadir}/doc
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
-rm -f $RPM_BUILD_ROOT%{_libdir}/moc/decoder_plugins/*.la
+rm -f $RPM_BUILD_ROOT%{_libdir}/mocp/decoder_plugins/*.la
 
 %files
 %doc README README_equalizer AUTHORS ChangeLog config.example keymap.example NEWS
@@ -97,9 +103,15 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/moc/decoder_plugins/*.la
 %{_bindir}/%{exec}
 %{_datadir}/%{name}/
 %{_mandir}/man1/%{exec}.*
-%{_libdir}/%{name}/
+%dir %{_libdir}/mocp
+%dir %{_libdir}/mocp/decoder_plugins
+%{_libdir}/mocp/decoder_plugins/*.so
 
 %changelog
+* Sun May 23 2021 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.38.svn3005
+- Fix conflicts of %%{_libdir}/%%{name}
+- Temporary disable RCC support (rhbz#1963427)
+
 * Wed Feb 03 2021 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 2.6-0.37.svn3005
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
