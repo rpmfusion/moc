@@ -14,7 +14,7 @@
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
 Version: 2.6
-Release: 0.38.svn%{checkout}%{?dist}
+Release: 0.39.svn%{checkout}%{?dist}
 License: GPLv3+
 URL:     http://moc.daper.net
 
@@ -48,7 +48,7 @@ BuildRequires: libtool-ltdl-devel
 BuildRequires: gettext-devel 
 BuildRequires: pkgconfig(opus)
 BuildRequires: libtool
-#BuildRequires: librcc-devel
+BuildRequires: librcc-devel
 BuildRequires: popt-devel
 BuildRequires: ffmpeg-devel
 BuildRequires: libmad-devel
@@ -77,7 +77,7 @@ export CFLAGS="-O0 -g"
 %endif
 export LT_SYS_LIBRARY_PATH=%{_libdir}/mocp
 %configure LT_SYS_LIBRARY_PATH=%{_libdir}/mocp \
- --disable-static --disable-silent-rules --disable-rpath --without-rcc \
+ --disable-static --disable-silent-rules --disable-rpath --with-rcc \
  --with-oss --with-alsa --with-jack --with-aac --with-mp3 \
  --with-musepack --with-vorbis --with-flac --with-wavpack \
  --with-sndfile --with-modplug --with-ffmpeg --with-speex \
@@ -108,6 +108,9 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/mocp/decoder_plugins/*.la
 %{_libdir}/mocp/decoder_plugins/*.so
 
 %changelog
+* Sat Jul 03 2021 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.39.svn3005
+- Enable RCC support
+
 * Sun May 23 2021 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.38.svn3005
 - Fix conflicts of %%{_libdir}/%%{name}
 - Temporary disable RCC support (rhbz#1963427)
