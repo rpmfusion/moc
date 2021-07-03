@@ -1,5 +1,5 @@
 ## Debug builds?
-%bcond_with debug
+%bcond_without debug
 #
 
 # Filtering of private libraries
@@ -14,7 +14,7 @@
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
 Version: 2.6
-Release: 0.39.svn%{checkout}%{?dist}
+Release: 0.40.svn%{checkout}%{?dist}
 License: GPLv3+
 URL:     http://moc.daper.net
 
@@ -57,6 +57,7 @@ BuildRequires: faad2-devel
 BuildRequires: autoconf, automake
 BuildRequires: gcc
 BuildRequires: make
+BuildRequires: patchelf
 
 %description
 MOC (music on console) is a console audio player for LINUX/UNIX designed to be
@@ -77,7 +78,7 @@ export CFLAGS="-O0 -g"
 %endif
 export LT_SYS_LIBRARY_PATH=%{_libdir}/mocp
 %configure LT_SYS_LIBRARY_PATH=%{_libdir}/mocp \
- --disable-static --disable-silent-rules --disable-rpath --with-rcc \
+ --disable-static --disable-silent-rules --enable-rpath --with-rcc \
  --with-oss --with-alsa --with-jack --with-aac --with-mp3 \
  --with-musepack --with-vorbis --with-flac --with-wavpack \
  --with-sndfile --with-modplug --with-ffmpeg --with-speex \
@@ -97,6 +98,8 @@ rm -rf $RPM_BUILD_ROOT%{_datadir}/doc
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 rm -f $RPM_BUILD_ROOT%{_libdir}/mocp/decoder_plugins/*.la
 
+patchelf --set-rpath %{_libdir}/mocp/decoder_plugins %{buildroot}%{_bindir}/*
+
 %files
 %doc README README_equalizer AUTHORS ChangeLog config.example keymap.example NEWS
 %license COPYING
@@ -108,6 +111,9 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/mocp/decoder_plugins/*.la
 %{_libdir}/mocp/decoder_plugins/*.so
 
 %changelog
+* Sat Jul 03 2021 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.40.svn3005
+- Restore rpath to the private decoder directory
+
 * Sat Jul 03 2021 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.39.svn3005
 - Enable RCC support
 
