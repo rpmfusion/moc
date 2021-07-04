@@ -1,5 +1,5 @@
 ## Debug builds?
-%bcond_without debug
+%bcond_with debug
 #
 
 # Filtering of private libraries
@@ -14,7 +14,7 @@
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
 Version: 2.6
-Release: 0.40.svn%{checkout}%{?dist}
+Release: 0.41.svn%{checkout}%{?dist}
 License: GPLv3+
 URL:     http://moc.daper.net
 
@@ -111,6 +111,9 @@ patchelf --set-rpath %{_libdir}/mocp/decoder_plugins %{buildroot}%{_bindir}/*
 %{_libdir}/mocp/decoder_plugins/*.so
 
 %changelog
+* Sun Jul 04 2021 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.41.svn3005
+- Disable debug mode
+
 * Sat Jul 03 2021 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.40.svn3005
 - Restore rpath to the private decoder directory
 
