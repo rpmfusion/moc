@@ -14,7 +14,7 @@
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
 Version: 2.6
-Release: 0.42.svn%{checkout}%{?dist}
+Release: 0.43.svn%{checkout}%{?dist}
 License: GPLv3+
 URL:     http://moc.daper.net
 
@@ -111,6 +111,9 @@ patchelf --set-rpath %{_libdir}/mocp/decoder_plugins %{buildroot}%{_bindir}/*
 %{_libdir}/mocp/decoder_plugins/*.so
 
 %changelog
+* Fri Nov 12 2021 Leigh Scott <leigh123linux@gmail.com> - 2.6-0.43.svn3005
+- Rebuilt for new ffmpeg snapshot
+
 * Tue Aug 03 2021 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 2.6-0.42.svn3005
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
