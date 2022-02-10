@@ -2,6 +2,13 @@
 %bcond_with debug
 #
 
+# MOC is not ready for FFMpeg-5+ yet
+%if 0%{?fedora} > 34
+%bcond_with oldffmpeg
+%else
+%bcond_with oldffmpeg
+%endif
+
 # Filtering of private libraries
 %global __provides_exclude_from ^%{_libdir}/mocp/.*\\.so$
 #
@@ -28,7 +35,8 @@ Patch0:  %{name}-r2961+lt_init-1.patch
 # RHBZ #1963427
 Patch1:  %{name}-change_private_libdir.patch
 
-Patch2:  %{name}-bugfix-ffmpeg45.patch
+# Initial fix for FFMpeg-5 
+Patch2:  %{name}-bugfix-ffmpeg5.patch
 
 BuildRequires: pkgconfig(ncurses)
 BuildRequires: pkgconfig(alsa) 
@@ -52,7 +60,11 @@ BuildRequires: pkgconfig(opus)
 BuildRequires: libtool
 BuildRequires: librcc-devel
 BuildRequires: popt-devel
+%if %{with oldffmpeg}
+BuildRequires: compat-ffmpeg4-devel
+%else
 BuildRequires: ffmpeg-devel
+%endif
 BuildRequires: libmad-devel
 BuildRequires: faad2-devel
 
@@ -68,7 +80,13 @@ using the menu similar to Midnight Commander, and MOC will start playing all
 files in this directory beginning from the chosen file.
 
 %prep
-%autosetup -p 1 -n trunk
+%autosetup -N -n trunk
+
+%patch0 -p1
+%patch1 -p1
+%if %{without oldffmpeg}
+%patch2 -p1
+%endif
 
 %build
 mv configure.in configure.ac
@@ -83,8 +101,15 @@ export LT_SYS_LIBRARY_PATH=%{_libdir}/mocp
  --disable-static --disable-silent-rules --enable-rpath --with-rcc \
  --with-oss --with-alsa --with-jack --with-aac --with-mp3 \
  --with-musepack --with-vorbis --with-flac --with-wavpack \
- --with-sndfile --with-modplug --with-ffmpeg --with-speex \
+ --with-sndfile --with-modplug --with-speex \
  --with-samplerate --with-curl --without-magic \
+%if %{with oldffmpeg}
+ ffmpeg_CPPFLAGS=-I%{_includedir}/compat-ffmpeg28 \
+ ffmpeg_CFLAGS=-I%{_includedir}/compat-ffmpeg28 \
+ ffmpeg_LIBS="-L%{_libdir}/compat-ffmpeg4 -lswscale -lavcodec -lavdevice -lavfilter -lavresample -lpostproc -lavutil" \
+%else
+ --with-ffmpeg \
+%endif
 %if %{with debug}
  --enable-debug \
 %else
@@ -113,7 +138,7 @@ patchelf --set-rpath %{_libdir}/mocp/decoder_plugins %{buildroot}%{_bindir}/*
 %{_libdir}/mocp/decoder_plugins/*.so
 
 %changelog
-* Wed Jan 05 2022 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.44.svn3005
+* Thu Feb 10 2022 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.44.svn3005
 - Bugfix for building against ffmpeg 5+
 
 * Fri Nov 12 2021 Leigh Scott <leigh123linux@gmail.com> - 2.6-0.43.svn3005
