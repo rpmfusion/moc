@@ -58,7 +58,7 @@ BuildRequires: libtool-ltdl-devel
 BuildRequires: gettext-devel 
 BuildRequires: pkgconfig(opus)
 BuildRequires: libtool
-BuildRequires: librcc-devel
+#BuildRequires: librcc-devel
 BuildRequires: popt-devel
 %if %{with oldffmpeg}
 BuildRequires: compat-ffmpeg4-devel
@@ -98,7 +98,7 @@ export CFLAGS="-O0 -g"
 %endif
 export LT_SYS_LIBRARY_PATH=%{_libdir}/mocp
 %configure LT_SYS_LIBRARY_PATH=%{_libdir}/mocp \
- --disable-static --disable-silent-rules --enable-rpath --with-rcc \
+ --disable-static --disable-silent-rules --enable-rpath --without-rcc \
  --with-oss --with-alsa --with-jack --with-aac --with-mp3 \
  --with-musepack --with-vorbis --with-flac --with-wavpack \
  --with-sndfile --with-modplug --with-speex \
@@ -140,6 +140,7 @@ patchelf --set-rpath %{_libdir}/mocp/decoder_plugins %{buildroot}%{_bindir}/*
 %changelog
 * Tue May 24 2022 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.45.svn3005
 - Rebuild for RPMFusion bug #6310
+- Disable RCC support
 
 * Thu Feb 10 2022 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.44.svn3005
 - Bugfix for building against ffmpeg 5+
