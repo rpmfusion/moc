@@ -1,0 +1,25 @@
+--- trunk/decoder_plugins/ffmpeg/ffmpeg.c.orig
++++ trunk/decoder_plugins/ffmpeg/ffmpeg.c
+@@ -62,9 +62,11 @@
+ # define AV_CODEC_CAP_TRUNCATED CODEC_CAP_TRUNCATED
+ #endif
+ 
++#if LIBAVCODEC_VERSION_MAJOR < 60
+ #ifndef AV_CODEC_FLAG_TRUNCATED
+ # define AV_CODEC_FLAG_TRUNCATED CODEC_FLAG_TRUNCATED
+ #endif
++#endif
+ 
+ /* Set SEEK_IN_DECODER to 1 if you'd prefer seeking to be delay until
+  * the next time ffmpeg_decode() is called.  This will provide seeking
+@@ -761,8 +763,10 @@ static void *ffmpeg_open_internal (struc
+ 	}
+ 
+ 	set_downmixing (data);
++#if LIBAVCODEC_VERSION_MAJOR < 60
+ 	if (data->codec->capabilities & AV_CODEC_CAP_TRUNCATED)
+ 		data->enc->flags |= AV_CODEC_FLAG_TRUNCATED;
++#endif
+ 
+ 	if (avcodec_open2 (data->enc, data->codec, NULL) < 0)
+ 	{
