@@ -83,11 +83,11 @@ files in this directory beginning from the chosen file.
 %prep
 %autosetup -N -n trunk
 
-%patch0 -p1
-%patch1 -p1
+%patch -P0 -p1
+%patch -P1 -p1
 %if %{without oldffmpeg}
-%patch2 -p1
-%patch3 -p1
+%patch -P2 -p1
+%patch -P3 -p1
 %endif
 
 %build
