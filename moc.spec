@@ -21,7 +21,7 @@
 Name:    moc
 Summary: Music on Console - Console audio player for Linux/UNIX
 Version: 2.6
-Release: 0.52.svn%{checkout}%{?dist}
+Release: 0.53.svn%{checkout}%{?dist}
 License: GPLv3+
 URL:     http://moc.daper.net
 
@@ -38,6 +38,9 @@ Patch1:  %{name}-change_private_libdir.patch
 # Initial fix for FFMpeg-5 
 Patch2:  %{name}-bugfix-ffmpeg5.patch
 Patch3:  ffmpeg6.patch
+# https://www.mail-archive.com/debian-bugs-dist@lists.debian.org/msg1991260.html
+# slightly modified
+Patch4:  %{name}-svn3005-ffmpeg7.patch
 
 BuildRequires: pkgconfig(ncurses)
 BuildRequires: pkgconfig(alsa) 
@@ -88,6 +91,7 @@ files in this directory beginning from the chosen file.
 %if %{without oldffmpeg}
 %patch -P2 -p1
 %patch -P3 -p1
+%patch -P4 -p1
 %endif
 
 %build
@@ -140,6 +144,9 @@ patchelf --set-rpath %{_libdir}/mocp/decoder_plugins %{buildroot}%{_bindir}/*
 %{_libdir}/mocp/decoder_plugins/*.so
 
 %changelog
+* Tue Nov 12 2024 Mamoru TASAKA <mtasaka@fedoraproject.org> - 2.6-0.53.svn3005
+- Patch for ffmpeg7, basically from debian with a bit modified
+
 * Wed Nov 06 2024 Sérgio Basto <sergio@serjux.com> - 2.6-0.52.svn3005
 - Rebuild for ffmpeg-7
 
