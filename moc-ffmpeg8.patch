@@ -1,0 +1,69 @@
+--- a/decoder_plugins/ffmpeg/ffmpeg.orig.c	2026-01-02 21:39:35.015173706 +0100
++++ b/decoder_plugins/ffmpeg/ffmpeg.c	2026-01-02 21:58:28.497696195 +0100
+@@ -812,7 +812,7 @@
+ #ifdef HAVE_AVCODEC_FREE_CONTEXT
+ 	avcodec_free_context (&data->enc);
+ #else
+-	avcodec_close (data->enc);
++	avcodec_free_context (&data->enc);
+ 	av_freep (&data->enc);
+ #endif
+ 	avformat_close_input (&data->ic);
+@@ -976,7 +976,7 @@
+ #if HAVE_AV_PACKET_FNS
+ 	av_packet_free (&pkt);
+ #else
+-	av_free_packet (pkt);
++	av_packet_unref (pkt);
+ 	av_free (pkt);
+ #endif
+ }
+@@ -1027,12 +1027,12 @@
+ 
+ #ifndef HAVE_AVCODEC_RECEIVE_FRAME
+ /* Decode samples from packet data using avcodec_decode_audio4(). */
+-# define decode_audio avcodec_decode_audio4
++# define decode_audio avcodec_receive_frame
+ #endif
+ 
+ #ifdef HAVE_AVCODEC_RECEIVE_FRAME
+ /* Decode audio using FFmpeg's send/receive encoding and decoding API. */
+-static int decode_audio (AVCodecContext *ctx, AVFrame *frame,
++static int decode_audio (AVCodecContext *ctx, AVFrame *frame,
+                          int *got_frame_ptr, const AVPacket *pkt)
+ {
+ 	int rc, result = 0;
+@@ -1102,14 +1102,12 @@
+ 
+ #ifdef HAVE_AV_FRAME_FNS
+ 	frame = av_frame_alloc ();
+-#else
+-	frame = avcodec_alloc_frame ();
+ #endif
+ 
+ 	do {
+ 		int len, got_frame, is_planar, packed_size, copied;
+ 
+-		len = decode_audio (data->enc, frame, &got_frame, pkt);
++		len = decode_audio (data->enc, frame, &got_frame, pkt);
+ 
+ 		if (len < 0) {
+ 			/* skip frame */
+@@ -1163,8 +1161,6 @@
+ 
+ #ifdef HAVE_AV_FRAME_FNS
+ 	av_frame_free (&frame);
+-#else
+-	avcodec_free_frame (&frame);
+ #endif
+ 
+ 	return filled;
+@@ -1343,7 +1339,7 @@
+ #ifdef HAVE_AVCODEC_FREE_CONTEXT
+ 		avcodec_free_context (&data->enc);
+ #else
+-		avcodec_close (data->enc);
++		avcodec_free_context (&data->enc);
+ 		av_freep (&data->enc);
+ #endif
+ 		avformat_close_input (&data->ic);

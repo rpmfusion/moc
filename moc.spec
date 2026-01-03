@@ -3,8 +3,8 @@
 #
 
 # Filtering of private libraries
-%global __provides_exclude_from ^%{_libdir}/mocp/.*\\.so$
-%global __requires_exclude_from ^%{_libdir}/mocp/.*\\.so$
+%global __provides_exclude_from ^%{_libdir}/mocp/decoder_plugins/.*\\.so$
+%global __requires_exclude_from ^%{_libdir}/mocp/decoder_plugins/.*\\.so$
 #
 
 %global checkout 3005
@@ -29,12 +29,14 @@ Patch0:  %{name}-r2961+lt_init-1.patch
 # RHBZ #1963427
 Patch1:  %{name}-change_private_libdir.patch
 
-# Initial fix for FFMpeg-5 
+# Fixes for FFMpeg
 Patch2:  %{name}-bugfix-ffmpeg5.patch
 Patch3:  ffmpeg6.patch
 # https://www.mail-archive.com/debian-bugs-dist@lists.debian.org/msg1991260.html
 # slightly modified
 Patch4:  %{name}-svn3005-ffmpeg7.patch
+
+Patch5:  %{name}-ffmpeg8.patch
 
 BuildRequires: pkgconfig(ncurses)
 BuildRequires: pkgconfig(alsa) 
@@ -80,12 +82,15 @@ files in this directory beginning from the chosen file.
 %prep
 %autosetup -N -n trunk
 
-%patch -P0 -p1
-%patch -P1 -p1
+%patch -P 0 -p1 -b .backup
+%patch -P 1 -p1 -b .backup
 # FFMpeg patches
-%patch -P2 -p1
-%patch -P3 -p1
-%patch -P4 -p1
+%patch -P 2 -p1 -b .backup
+%patch -P 3 -p1 -b .backup
+%patch -P 4 -p1 -b .backup
+%if 0%{?fedora} > 43
+%patch -P 5 -p1 -b .backup
+%endif
 
 %build
 mv configure.in configure.ac
@@ -112,7 +117,11 @@ export LDFLAGS="%{__global_ldflags} -Wl,-rpath,%{_libdir}/mocp/decoder_plugins"
  CPPFLAGS="-I%{_includedir}/libdb -fPIC" \
  ffmpeg_CPPFLAGS=-I%{_includedir}/ffmpeg \
  ffmpeg_CFLAGS=-I%{_includedir}/ffmpeg \
+%if 0%{?fedora} > 43
+ ffmpeg_LIBS="-L%{_libdir} -lswscale -lavcodec -lavdevice -lavfilter -lswresample -lavutil" \
+%else
  ffmpeg_LIBS="-L%{_libdir} -lswscale -lavcodec -lavdevice -lavfilter -lswresample -lpostproc -lavutil" \
+%endif
 
 %make_build
 
@@ -133,8 +142,9 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/mocp/decoder_plugins/*.la
 %{_libdir}/mocp/decoder_plugins/*.so
 
 %changelog
-* Fri Jan 02 2026 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.58.svn3005
+* Sat Jan 03 2026 Antonio Trande <sagitter@fedoraproject.org> - 2.6-0.58.svn3005
 - Reset rpath
+- Patched for ffmpeg8
 
 * Wed Nov 05 2025 Leigh Scott <leigh123linux@gmail.com> - 2.6-0.57.svn3005
 - Rebuild for ffmpeg-8.0
