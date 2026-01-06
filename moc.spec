@@ -60,11 +60,11 @@ BuildRequires: pkgconfig(opus)
 BuildRequires: libtool
 #BuildRequires: librcc-devel
 BuildRequires: popt-devel
-BuildRequires: libswscale-free-devel
-BuildRequires: libavformat-free-devel
-BuildRequires: libavfilter-free-devel
-BuildRequires: libavdevice-free-devel
-BuildRequires: libavcodec-free-devel
+BuildRequires: pkgconfig(libswscale)
+BuildRequires: pkgconfig(libavformat)
+BuildRequires: pkgconfig(libavfilter)
+BuildRequires: pkgconfig(libavdevice)
+BuildRequires: pkgconfig(libavcodec)
 BuildRequires: libmad-devel
 BuildRequires: faad2-devel
 
